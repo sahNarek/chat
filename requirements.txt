@@ -1,0 +1,8 @@
+accelerate
+chardet
+charset-normalizer==2.0.12
+torch
+torchvision
+torchaudio
+flask
+transformers
