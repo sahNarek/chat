@@ -22,7 +22,8 @@ def health():
 
 @click.command()
 @click.option('--port', default=None, help='Port to override')
-def main(port: str = "", server_type: str = "standard"):
+@click.option('--debug', default=False, help='Debug mode', is_flag=True)
+def main(port: str = "", debug: bool = False):
     """Main function to run the server
 
     Args:
@@ -30,7 +31,7 @@ def main(port: str = "", server_type: str = "standard"):
         server_type (str, optional): _description_. Defaults to "".
     """
     app_config = get_config()
-    app.run(debug=True, port=port or app_config.PORT )
+    app.run(debug=debug, port=port or app_config.PORT )
 
 if __name__ == '__main__':
     main()

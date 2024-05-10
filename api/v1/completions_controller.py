@@ -8,8 +8,6 @@ from functools import wraps
 completions_bp = Blueprint("completions", __name__, url_prefix="/v1")
 llm_model = LlmModel(app_config.MODEL_NAME)
 conversation = Conversation()
-PREMIUM_ROLE = "PREMIUM_USER"
-
 
 def access_level_required(access_level):
     """
@@ -19,7 +17,7 @@ def access_level_required(access_level):
         @wraps(func)
         def wrapper(*args, **kwargs):
             user_data = kwargs.get("user_data")
-            if PREMIUM_ROLE in user_data.get("authorities") and app_config.TYPE == access_level:
+            if (app_config.USER_ROLE in user_data.get("authorities")):
                 return func(*args, **kwargs)
             return jsonify({"error": f"This endpoint is only available for {access_level} users"}), 403
         return wrapper
@@ -48,6 +46,8 @@ def handle_prompt(user_data: dict, user_prompt):
         if not user_prompt:
             return jsonify({"error": "No prompt provided"}), 400
         previous_conversations = conversation.get_user_conversations(user_data.get("sub"))
+        if (len(previous_conversations) == app_config.QUESTIONS_LIMIT):
+            return jsonify({"error": f"You have reached the limit of {app_config.QUESTIONS_LIMIT} questions of your plan."}), 400
         llm_response = llm_model.generate(user_prompt, previous_conversations)
         conversation.save_conversation(user_data.get("sub"),
             {
@@ -66,26 +66,13 @@ def handle_prompt(user_data: dict, user_prompt):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-@completions_bp.route("/premium-completions", methods=["POST"])
+@completions_bp.route(app_config.ENDPOINT, methods=["POST"])
 @auth_required
-@access_level_required("premium")
-def completions_premium(user_data):
+@access_level_required(app_config.TYPE)
+def completions(user_data):
     """_summary_
 
     Returns:
         _type_: _description_
-    """
-    return handle_prompt(user_data, request.json.get("prompt"))
-
-
-@completions_bp.route("/completions", methods=["POST"])
-@auth_required
-def completions(user_data: dict):
-    """
-    Get completions for the given text
-
-    Returns:
-        JSON: Completions for the given text
     """
     return handle_prompt(user_data, request.json.get("prompt"))

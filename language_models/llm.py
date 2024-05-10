@@ -37,11 +37,13 @@ class LlmModel:
         """
         user_message = self.build_user_message(user_prompt)
         messages_to_pass = self.messages + previous_messages + user_message
+        number_of_messages = min(len(messages_to_pass), 4)
+        messages_to_pass = messages_to_pass[-number_of_messages:]
         prompt = self.pipe.tokenizer.apply_chat_template(messages_to_pass, tokenize=False, add_generation_prompt=True)
-        outputs = self.pipe(prompt, max_new_tokens=256, do_sample=True, temperature=0.7, top_k=50, top_p=0.95)
+        outputs = self.pipe(prompt, max_new_tokens=256, do_sample=True, temperature=0.5, top_k=50, top_p=0.95)
         parts = outputs[0]["generated_text"].split("<|assistant|>")
-        if len(parts) > 1:
-            assistant_response = parts[1]
+        if len(parts) >= 1:
+            assistant_response = parts[-1]
             lastdot = assistant_response.rfind('.')
             return assistant_response[:lastdot + 1]
         return "Unexpected response format"

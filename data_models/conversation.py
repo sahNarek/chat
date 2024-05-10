@@ -5,6 +5,18 @@ connection_url = app_config.DATABASE_URL
 
 
 class Conversation:
+    """
+    Class to handle the conversation data
+
+    methods:
+    - get_user_conversations    
+    - save_conversation
+    - insert_conversation
+    - update_conversation
+    - delete_conversation
+    - delete_all_conversations
+    - get_all_conversations
+    """
     def __init__(self) -> None:
         self.client = MongoClient(connection_url)
         self.database = self.client.get_database("chatDb")
