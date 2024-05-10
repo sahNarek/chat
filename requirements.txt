@@ -1,8 +1,8 @@
-accelerate
-chardet
-charset-normalizer==2.0.12
-torch
-torchvision
-torchaudio
-flask
-transformers
+click==8.1.3
+Flask
+pydantic_settings==2.2.1
+PyJWT==2.8.0
+pymongo==3.13.0
+python-dotenv==1.0.1
+torch==2.3.0
+transformers==4.40.2
