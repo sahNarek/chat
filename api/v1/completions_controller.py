@@ -46,7 +46,7 @@ def handle_prompt(user_data: dict, user_prompt):
         if not user_prompt:
             return jsonify({"error": "No prompt provided"}), 400
         previous_conversations = conversation.get_user_conversations(user_data.get("sub"))
-        if (len(previous_conversations) == app_config.QUESTIONS_LIMIT):
+        if (len(previous_conversations) >= app_config.QUESTIONS_LIMIT):
             return jsonify({"error": f"You have reached the limit of {app_config.QUESTIONS_LIMIT} questions of your plan."}), 400
         llm_response = llm_model.generate(user_prompt, previous_conversations)
         conversation.save_conversation(user_data.get("sub"),
